@@ -1,0 +1,76 @@
+package xExperimental.whitebaord.tools;
+
+import javafx.scene.Cursor;
+import javafx.scene.Node;
+import javafx.scene.input.MouseEvent;
+
+/**
+ * A tool to pan around the Canvas2.
+ */
+public class Mover extends Tool {
+
+    private double iniX;
+    private double iniY;
+
+    /**
+     * Create a Mover.
+     */
+    public Mover(Tool tool) {
+	super(tool.getCanvas());
+
+	setTool(tool);
+    }
+
+    @Override
+    public void onMouseDown(MouseEvent e) {
+	// Get an initial X/Y point.
+	iniX = e.getX();
+	iniY = e.getY();
+
+	// Set the cursor
+	getCanvas().setCursor(Cursor.MOVE);
+    }
+
+    @Override
+    public void onMouseDrag(MouseEvent e) {
+	// Change the translation of each Node on the Canvas2.
+	for (Node c : getCanvas().getChildren()) {
+	    c.setTranslateX(c.getTranslateX() + e.getX() - iniX);
+	    c.setTranslateY(c.getTranslateY() + e.getY() - iniY);
+	}
+
+	// Set the location of the Canvas2.
+	if (!getCanvas().getChildren().isEmpty()) {
+	    double transX = getCanvas().getChildren().get(0).getTranslateX();
+	    double transY = getCanvas().getChildren().get(0).getTranslateY();
+	    getCanvas().setLocation(transX + e.getY() - iniX, transY + e.getY() - iniY);
+	}
+
+	// Set the inital X/Y points for the next drag.
+	iniX = e.getX();
+	iniY = e.getY();
+    }
+
+    @Override
+    public void onMouseReleased(MouseEvent e) {
+	// Return the cursor to the current Tools cursor.
+	getCanvas().setCursor(getTool().getCursor());
+    }
+
+    @Override
+    public void setTool(Tool tool) {
+	// Don't do all that super stuff. We just want a basic setter.
+	this.tool = tool;
+    }
+
+    // These must be implemented so the mover is not called on themselves.
+    @Override
+    public void onRightMouseDown(MouseEvent e) {}
+
+    @Override
+    public void onRightMouseDrag(MouseEvent e) {}
+
+    @Override
+    public void onRightMouseReleased(MouseEvent e) {}
+
+}
